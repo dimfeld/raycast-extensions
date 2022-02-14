@@ -13,11 +13,11 @@ export type Docset = {
   pluginKeyword: string;
 };
 
-export function useDocsets(searchText: string): [Docset[], string|null, boolean] {
+export function useDocsets(searchText: string): [Docset[], string | null, boolean] {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [docsets, setDocsets] = useState<Docset[]>([]);
   const [filteredDocsets, setFilteredDocsets] = useState<Docset[]>([]);
-  const [exactMatchKeyword, setExactMatchKeyword] = useState<string|null>(null);
+  const [exactMatchKeyword, setExactMatchKeyword] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -29,30 +29,24 @@ export function useDocsets(searchText: string): [Docset[], string|null, boolean]
 
   useEffect(() => {
     const searchLower = searchText.toLowerCase();
-    const filtered =
-      docsets.filter(
-        (docset) =>
-          docset.docsetName.toLowerCase().includes(searchLower) ||
-          docset.docsetKeyword.toLowerCase().includes(searchLower)
-      );
-
-    const exactMatchIndex = filtered.findIndex(
+    const filtered = docsets.filter(
       (docset) =>
-        docset.docsetKeyword.toLowerCase() === searchLower ||
-        docset.docsetName.toLowerCase() === searchLower
+        docset.docsetName.toLowerCase().includes(searchLower) ||
+        docset.docsetKeyword.toLowerCase().includes(searchLower)
     );
 
-    if(exactMatchIndex >= 0) {
-      // If we have an exact match, move it to the front of the list.
-      const [ exactMatch ] = filtered.splice(exactMatchIndex, 1);
-      filtered.unshift(exactMatch);
-    }
+    const exactMatch = filtered.find(
+      (docset) => docset.docsetKeyword.toLowerCase() === searchLower || docset.docsetName.toLowerCase() === searchLower
+    );
 
-    setFilteredDocsets(filtered);
+    setFilteredDocsets(exactMatch ? [exactMatch] : filtered);
 
-    const firstSearchToken = searchLower.split(' ')[0];
-    const exactMatchFirstToken = docsets.find((docset) => docset.docsetName.toLowerCase() === firstSearchToken || docset.docsetKeyword.toLowerCase() === firstSearchToken);
-    setExactMatchKeyword(exactMatchFirstToken?.docsetKeyword ?? null);
+    const firstSearchToken = searchLower.split(" ")[0];
+    const firstTokenMatch = docsets.find(
+      (docset) =>
+        docset.docsetName.toLowerCase() === firstSearchToken || docset.docsetKeyword.toLowerCase() === firstSearchToken
+    );
+    setExactMatchKeyword(firstTokenMatch?.docsetKeyword ?? null);
   }, [searchText]);
 
   return [searchText.length ? filteredDocsets : docsets, exactMatchKeyword, isLoading];
