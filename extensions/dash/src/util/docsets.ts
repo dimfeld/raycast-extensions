@@ -27,13 +27,27 @@ export function useDocsets(searchText: string): [Docset[], boolean] {
   }, []);
 
   useEffect(() => {
-    setFilteredDocsets(
+    const searchLower = searchText.toLowerCase();
+    const filtered =
       docsets.filter(
         (docset) =>
-          docset.docsetName.toLowerCase().includes(searchText.toLowerCase()) ||
-          docset.docsetKeyword.toLowerCase().includes(searchText.toLowerCase())
-      )
+          docset.docsetName.toLowerCase().includes(searchLower) ||
+          docset.docsetKeyword.toLowerCase().includes(searchLower)
+      );
+
+    const exactMatchIndex = filtered.findIndex(
+      (docset) =>
+        docset.docsetKeyword.toLowerCase() === searchLower ||
+        docset.docsetName.toLowerCase() === searchLower
     );
+
+    if(exactMatchIndex > 0) {
+      // If we have an exact match, move it to the front of the list.
+      const [ exactMatch ] = filtered.splice(exactMatchIndex, 1);
+      filtered.unshift(exactMatch);
+    }
+
+    setFilteredDocsets(filtered);
   }, [searchText]);
 
   return [searchText.length ? filteredDocsets : docsets, isLoading];
