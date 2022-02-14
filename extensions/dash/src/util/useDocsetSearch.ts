@@ -52,11 +52,12 @@ export function useDocsetSearch(searchText: string, keyword = "", stripKeywordPr
 
     setLoading(true);
     if (searchText.length) {
-      const usedSearchText = stripKeywordPrefix &&
-            searchText.length > keyword.length + 1 &&
-            (searchText.startsWith(keyword + ' ') || searchText.startsWith(keyword + ':')) ?
-        searchText.slice(keyword.length + 1) :
-        searchText;
+      const words = searchText.split(/\s+/);
+
+      const usedSearchText =
+        stripKeywordPrefix && words.length > 1 && (words[0] === keyword || words[0] === keyword + ":")
+          ? words.slice(1).join(" ")
+          : searchText;
 
       setResults(await searchDash(`${keyword ? `${keyword}:` : ""}${usedSearchText}`, cancel.current.signal));
     } else {

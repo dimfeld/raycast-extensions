@@ -41,7 +41,7 @@ export function useDocsets(searchText: string): [Docset[], string | null, boolea
 
     setFilteredDocsets(exactMatch ? [exactMatch] : filtered);
 
-    const firstSearchToken = searchLower.split(" ")[0];
+    const firstSearchToken = searchLower.split(/[ :]/, 1)[0];
     const firstTokenMatch = docsets.find(
       (docset) =>
         docset.docsetName.toLowerCase() === firstSearchToken || docset.docsetKeyword.toLowerCase() === firstSearchToken
