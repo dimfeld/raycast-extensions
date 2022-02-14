@@ -7,8 +7,12 @@ import DashResult from "./components/DashResult";
 
 export default function MultiDocsetSearch() {
   const [searchText, setSearchText] = useState("");
-  const [docsets, isLoadingDocsets] = useDocsets(searchText);
-  const [searchResults, isLoadingSearchResults] = useDocsetSearch(searchText);
+  const [docsets, exactMatchKeyword, isLoadingDocsets] = useDocsets(searchText);
+  const [searchResults, isLoadingSearchResults] = useDocsetSearch(
+    searchText,
+    exactMatchKeyword ?? "",
+    Boolean(exactMatchKeyword)
+  );
 
   return (
     <List

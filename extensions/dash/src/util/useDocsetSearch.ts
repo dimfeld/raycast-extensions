@@ -41,7 +41,7 @@ async function searchDash(query: string, signal: AbortSignal): Promise<DashResul
   });
 }
 
-export function useDocsetSearch(searchText: string, keyword = ""): [DashResult[], boolean] {
+export function useDocsetSearch(searchText: string, keyword = "", stripKeywordPrefix = false): [DashResult[], boolean] {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [results, setResults] = useState<DashResult[]>([]);
   const cancel = useRef<AbortController>(new AbortController());
@@ -52,7 +52,13 @@ export function useDocsetSearch(searchText: string, keyword = ""): [DashResult[]
 
     setLoading(true);
     if (searchText.length) {
-      setResults(await searchDash(`${keyword ? `${keyword}:` : ""}${searchText}`, cancel.current.signal));
+      const usedSearchText = stripKeywordPrefix &&
+            searchText.length > keyword.length + 1 &&
+            (searchText.startsWith(keyword + ' ') || searchText.startsWith(keyword + ':')) ?
+        searchText.slice(keyword.length + 1) :
+        searchText;
+
+      setResults(await searchDash(`${keyword ? `${keyword}:` : ""}${usedSearchText}`, cancel.current.signal));
     } else {
       setResults([]);
     }
